@@ -1,20 +1,25 @@
 import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { CreateUserDto } from '../users/dto/create-user.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  register(@Body() body: any) {
-    console.log('Registering new user: ', body);
-    return this.authService.register(body);
+  register(@Body() createUserDto: CreateUserDto) {
+    console.log('Registering new user: ', createUserDto);
+    return this.authService.register(createUserDto);
   }
 
   @Post('login')
-  async login(@Body() body: any) {
-    console.log('Logining user: ', body);
-    const user = await this.authService.validateUser(body.email, body.password);
+  async login(@Body() loginDto: LoginDto) {
+    console.log('Logining user: ', loginDto);
+    const user = await this.authService.validateUser(
+      loginDto.email,
+      loginDto.password,
+    );
     if (!user) {
       throw new UnauthorizedException();
     }

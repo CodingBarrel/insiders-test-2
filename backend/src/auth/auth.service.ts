@@ -3,6 +3,8 @@ import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { CreateUserDto } from '../users/dto/create-user.dto';
+import { PayloadDto } from './dto/payload.dto';
 
 @Injectable()
 export class AuthService {
@@ -11,7 +13,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<any> {
+  async validateUser(email: string, password: string): Promise<User | null> {
     console.log(`Validating user with email: ${email} password: ${password}`);
     const user: User | null = await this.usersService.findByEmail(email);
 
@@ -23,9 +25,10 @@ export class AuthService {
     return null;
   }
 
-  login(user: any) {
-    console.log(`Sending login payload [${user.email} ${user.role}]`);
-    const payload = {
+  login(user: User) {
+    console.log(`Sending login payload [${user.email}]`);
+    const payload: PayloadDto = {
+      userId: user.id,
       email: user.email,
       role: user.role,
     };
@@ -35,11 +38,11 @@ export class AuthService {
     };
   }
 
-  async register(userData: any): Promise<User> {
-    console.log(`Registering user ${JSON.stringify(userData)}`);
-    const hashedPassword = await bcrypt.hash(userData.password, 10);
+  async register(createUserDto: CreateUserDto): Promise<User> {
+    console.log(`Registering user ${JSON.stringify(createUserDto)}`);
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     return this.usersService.create({
-      ...userData,
+      ...createUserDto,
       password: hashedPassword,
     });
   }
