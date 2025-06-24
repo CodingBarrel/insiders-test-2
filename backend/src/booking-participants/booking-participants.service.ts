@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { BookingParticipant } from './booking-participants.entity';
+import { BookingParticipant } from './entities/booking-participants.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateParticipantDto } from './dto/create-participant.dto';

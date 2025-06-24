@@ -1,5 +1,5 @@
 import { IsEnum, IsNumber } from 'class-validator';
-import { BookingParticipantsRole } from '../booking-participants-role.enum';
+import { BookingParticipantsRole } from '../entities/booking-participants-role.enum';
 
 export class CreateParticipantDto {
   @IsNumber()

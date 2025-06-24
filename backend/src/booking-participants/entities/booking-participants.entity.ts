@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Booking } from '../bookings/entities/booking.entity';
-import { User } from '../users/user.entity';
+import { Booking } from '../../bookings/entities/booking.entity';
+import { User } from '../../users/user.entity';
 import { BookingParticipantsRole } from './booking-participants-role.enum';
 
 @Entity()

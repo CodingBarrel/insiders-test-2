@@ -3,7 +3,7 @@ import { BookingParticipantsService } from './booking-participants.service';
 import { BookingParticipantsController } from './booking-participants.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from '../users/users.module';
-import { BookingParticipant } from './booking-participants.entity';
+import { BookingParticipant } from './entities/booking-participants.entity';
 import { BookingsModule } from '../bookings/bookings.module';
 
 @Module({

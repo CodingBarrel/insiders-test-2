@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Room } from '../../rooms/entities/room.entity';
-import { BookingParticipant } from '../../booking-participants/booking-participants.entity';
+import { BookingParticipant } from '../../booking-participants/entities/booking-participants.entity';
 
 @Entity()
 export class Booking {
