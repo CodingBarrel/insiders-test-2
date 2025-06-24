@@ -1,17 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { Auth, Repository } from 'typeorm';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
     console.log(`Validating user with email: ${email} password: ${password}`);
     const user: User | null = await this.usersService.findByEmail(email);
 
-    if (user && password === user?.password) {
+    if (user && (await bcrypt.compare(password, user.password))) {
       console.log(`Validated ${JSON.stringify(user)}`);
       return user;
     }
@@ -26,11 +30,17 @@ export class AuthService {
       role: user.role,
     };
 
-    return payload;
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
   }
 
   async register(userData: any): Promise<User> {
     console.log(`Registering user ${JSON.stringify(userData)}`);
-    return this.usersService.create(userData);
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
+    return this.usersService.create({
+      ...userData,
+      password: hashedPassword,
+    });
   }
 }
