@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-import { PayloadDto } from './dto/payload.dto';
+import { JwtPayloadDto } from './dto/jwt-payload.dto';
 
 @Injectable()
 export class AuthService {
@@ -13,24 +13,24 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<User | null> {
+  async validateUser(email: string, password: string): Promise<User> {
     console.log(`Validating user with email: ${email} password: ${password}`);
-    const user: User | null = await this.usersService.findByEmail(email);
+    const user: User | null = await this.usersService.findOneByEmail(email);
 
     if (user && (await bcrypt.compare(password, user.password))) {
       console.log(`Validated ${JSON.stringify(user)}`);
       return user;
     }
-    console.log(`Invalid email: ${email} / password: ${password}`);
-    return null;
+    throw new UnauthorizedException(
+      `Invalid email: ${email} / password: ${password}`,
+    );
   }
 
-  login(user: User) {
+  sign(user: User) {
     console.log(`Sending login payload [${user.email}]`);
-    const payload: PayloadDto = {
+    const payload: JwtPayloadDto = {
       userId: user.id,
       email: user.email,
-      role: user.role,
     };
 
     return {
@@ -42,7 +42,8 @@ export class AuthService {
     console.log(`Registering user ${JSON.stringify(createUserDto)}`);
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     return this.usersService.create({
-      ...createUserDto,
+      email: createUserDto.email,
+      name: createUserDto.name,
       password: hashedPassword,
     });
   }

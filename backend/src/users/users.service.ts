@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -10,17 +11,29 @@ export class UsersService {
     private usersRepo: Repository<User>,
   ) {}
 
-  findByEmail(email: string): Promise<User | null> {
-    console.log(`Finding user ${email}...`);
-    const res = this.usersRepo.findOne({ where: { email } });
-    console.log(`is user ${email} exists: `, res !== null);
-    return res;
+  async findOneById(id: number): Promise<User> {
+    console.log(`Finding user with id ${id}...`);
+    const user = await this.usersRepo.findOneBy({ id });
+    if (!user) throw new NotFoundException(`User with  id ${id} not found!`);
+    return user;
   }
 
-  create(userData: Partial<User>): Promise<User> {
-    console.log(`Creating user ${JSON.stringify(userData)}`);
-    const user = this.usersRepo.create(userData);
+  async findOneByEmail(email: string): Promise<User> {
+    console.log(`Finding user with email ${email}...`);
+    const user = await this.usersRepo.findOneBy({ email });
+    if (!user)
+      throw new NotFoundException(`User with  email ${email} not found!`);
+    return user;
+  }
+
+  async create(dto: CreateUserDto): Promise<User> {
+    console.log(`Creating user ${dto.email}`);
+    const user = this.usersRepo.create({
+      email: dto.email,
+      name: dto.name,
+      password: dto.password,
+    });
     console.log(`Created user ${JSON.stringify(user)}`);
-    return this.usersRepo.save(user);
+    return await this.usersRepo.save(user);
   }
 }

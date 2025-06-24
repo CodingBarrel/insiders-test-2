@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
@@ -20,9 +20,6 @@ export class AuthController {
       loginDto.email,
       loginDto.password,
     );
-    if (!user) {
-      throw new UnauthorizedException();
-    }
-    return this.authService.login(user);
+    return this.authService.sign(user);
   }
 }
