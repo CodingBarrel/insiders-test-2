@@ -27,7 +27,7 @@ export class AuthService {
   }
 
   sign(user: User) {
-    console.log(`Sending login payload [${user.email}]`);
+    console.log(`Sending login payload for [${user.id}]`);
     const payload: JwtPayloadDto = {
       userId: user.id,
       email: user.email,
@@ -35,6 +35,10 @@ export class AuthService {
 
     return {
       access_token: this.jwtService.sign(payload),
+      user: {
+        sub: user.id,
+        name: user.name,
+      },
     };
   }
 
